@@ -1,0 +1,21 @@
+.gradle
+.scannerwork
+
+!gradle/wrapper/gradle-wrapper.jar
+gradlew.bat
+
+### IntelliJ IDEA ###
+.idea
+*.iws
+*.iml
+*.ipr
+
+out/
+build/
+!**/src/main/**/out/
+!**/src/test/**/out/
+!**/src/main/**/build/
+!**/src/test/**/build/
+
+.DS_Store
+HELP.md
