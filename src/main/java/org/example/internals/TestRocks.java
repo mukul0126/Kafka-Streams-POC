@@ -1,29 +1,28 @@
 package org.example.internals;
 
 
+import org.example.api.MessageStatusState;
 import org.example.api.RocksDBTTLStore;
 import org.rocksdb.RocksDBException;
 
 import java.io.IOException;
 import java.util.concurrent.CountDownLatch;
 
-public class Test {
+public class TestRocks {
   public static void main(String[] args)
       throws IOException, RocksDBException, InterruptedException {
     CountDownLatch c = new CountDownLatch(1);
     String s = getAlphaNumericString(1024 * 100);
-    RocksDBTTLStore<String> db = new RocksDBTTLStore<>("test", 10, String.class);
-    db.put("mukul", "gupta");
-    System.out.println(db.get("mukul"));
-    for (int i = 0; i < 100000; i++) {
-      String k = "mukul" + i;
-      db.put(k, s);
-    }
+//    RocksDBTTLStore<String> db = new RocksDBTTLStore<>("test", 1, String.class);
+
+    RocksDBTTLStore<MessageStatusState> db = new RocksDBTTLStore<>("state-status-store", 172800, MessageStatusState.class);
 
 
-    System.out.println(db.get("mukul"));
-//    c.await();
-//    db.close();
+    MessageStatusState se = new MessageStatusState();
+    se.setStatusState(2);
+    db.put("muk1", se);
+    System.out.println(db.get("state_51_user20007"));
+    db.close();
   }
 
 

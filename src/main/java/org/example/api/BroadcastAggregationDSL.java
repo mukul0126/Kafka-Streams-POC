@@ -1,5 +1,6 @@
 package org.example.api;
 
+import io.micrometer.core.instrument.MeterRegistry;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.common.serialization.Serdes;
 import org.apache.kafka.streams.KeyValue;
@@ -16,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.annotation.EnableKafkaStreams;
 import org.springframework.kafka.config.KafkaStreamsConfiguration;
 import org.springframework.kafka.config.StreamsBuilderFactoryBean;
+import org.springframework.kafka.streams.KafkaStreamsMicrometerListener;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
@@ -38,8 +40,11 @@ public class BroadcastAggregationDSL {
   @Autowired
   private StreamsBuilder builder;
 
+  @Autowired
+  private StreamsBuilderFactoryBean streamsBuilderFactoryBean;
 
-  StreamsBuilderFactoryBean streamsBuilderFactoryBean;
+  @Autowired
+  private MeterRegistry meterRegistry;
 
   @PostConstruct
   private void processIncomingMessagesKStream() {
@@ -49,9 +54,12 @@ public class BroadcastAggregationDSL {
     props.put(COMMIT_INTERVAL_MS_CONFIG, 2000);
     props.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "latest");
     kafkaStreamsConfiguration.asProperties().putAll(props);
+
+    streamsBuilderFactoryBean.addListener(new KafkaStreamsMicrometerListener(meterRegistry));
     KStream<String, String> packets =
         builder.stream("test.topic", Consumed.with(Serdes.String(), Serdes.String()));
-    packets.transform(StatusPacketTransformer::new)
+    packets
+        .process(StatusPacketProcessor::new)
         .groupByKey(Grouped.valueSerde(CustomSerdes.broadcastStatsSerde())).windowedBy(
             TimeWindows.ofSizeWithNoGrace(Duration.ofMinutes(2)))
         .aggregate(() -> null, new BroadcastAggregator(), Materialized.with(Serdes.String(), CustomSerdes.broadcastStatsSerde()))
@@ -64,4 +72,6 @@ public class BroadcastAggregationDSL {
         )
         .to("sink-topic", Produced.with(Serdes.String(), CustomSerdes.broadcastStatsSerde()));
   }
+
+
 }

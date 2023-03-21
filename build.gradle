@@ -29,11 +29,22 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-actuator")
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.1'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.1'
-    implementation group: 'org.apache.kafka', name: 'kafka-streams', version: '3.1.1'
+    implementation group: 'org.apache.kafka', name: 'kafka-streams', version: '3.3.2'
     implementation("org.springframework.kafka:spring-kafka")
     implementation group: 'com.google.code.gson', name: 'gson', version: '2.9.0'
+    implementation 'io.micrometer:micrometer-registry-prometheus'
+    implementation("org.apache.kafka:kafka-clients:3.3.2"){
+        force = true
+    }
 }
 
 test {
     useJUnitPlatform()
+}
+
+configurations.all {
+    resolutionStrategy {
+        force 'org.apache.kafka:kafka-clients:3.3.2'
+
+    }
 }

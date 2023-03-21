@@ -6,8 +6,10 @@ import org.apache.kafka.streams.processor.api.Processor;
 import org.apache.kafka.streams.processor.api.ProcessorContext;
 import org.apache.kafka.streams.processor.api.Record;
 
-public class AggregationFormatter implements Processor<Windowed<String>, Change<BroadcastStats>, String, BroadcastStats> {
+import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.ReentrantLock;
 
+public class AggregationFormatter implements Processor<Windowed<String>, Change<BroadcastStats>, String, BroadcastStats> {
   private ProcessorContext<String, BroadcastStats> context;
 
   @Override

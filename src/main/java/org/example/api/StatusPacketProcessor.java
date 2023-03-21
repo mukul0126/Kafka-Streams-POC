@@ -26,7 +26,7 @@ public class StatusPacketProcessor implements Processor<String, String, String, 
     this.reader = mapper.readerFor(BroadcastStatusPacket.class);
     this.context = context;
     //change it to get store from store provider
-    this.store = new RocksDBTTLStore<>("status-store", 10, MessageStatusState.class);
+    this.store = new RocksDBTTLStore<>("/Users/mukulgupta/Desktop/rocksdb_ttl_store/state-status-store", 10, MessageStatusState.class);
 
   }
 
